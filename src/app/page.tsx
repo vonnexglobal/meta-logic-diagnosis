@@ -37,40 +37,14 @@ const profitTrends = [
 
 // 分步表单组件
 const MetaLogicDiagnosis = () => {
-  // 从 LocalStorage 加载数据
-  const loadFromLocalStorage = () => {
-    try {
-      const savedData = localStorage.getItem('metaLogicDiagnosis');
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        return {
-          currentStep: parsedData.currentStep || 1,
-          formData: parsedData.formData || {
-            industry: '',
-            revenueScale: '',
-            painPoints: [],
-            onlineRatio: 50,
-            profitTrend: ''
-          },
-          pageState: parsedData.pageState || 'form'
-        };
-      }
-    } catch (error) {
-      console.error('Error loading from localStorage:', error);
-    }
-    return {
-      currentStep: 1,
-      formData: {
-        industry: '',
-        revenueScale: '',
-        painPoints: [],
-        onlineRatio: 50,
-        profitTrend: ''
-      },
-      pageState: 'form'
-    };
+  // 表单数据类型定义
+  type FormData = {
+    industry: string;
+    revenueScale: string;
+    painPoints: string[];
+    onlineRatio: number;
+    profitTrend: string;
   };
-
   // 保存数据到 LocalStorage
   const saveToLocalStorage = (data: any) => {
     try {
@@ -80,16 +54,41 @@ const MetaLogicDiagnosis = () => {
     }
   };
 
-  // 初始状态从 LocalStorage 加载
-  const initialData = loadFromLocalStorage();
-  // 当前步骤
-  const [currentStep, setCurrentStep] = useState(initialData.currentStep);
+  // 初始状态使用默认值（服务器端和客户端一致）
+  const [currentStep, setCurrentStep] = useState(1);
   // 表单数据
-  const [formData, setFormData] = useState(initialData.formData);
+  const [formData, setFormData] = useState<FormData>({
+    industry: '',
+    revenueScale: '',
+    painPoints: [],
+    onlineRatio: 50,
+    profitTrend: ''
+  });
   // 加载状态
   const [isLoading, setIsLoading] = useState(false);
   // 页面状态: form, loading, result, report
-  const [pageState, setPageState] = useState<'form' | 'loading' | 'result' | 'report'>(initialData.pageState);
+  const [pageState, setPageState] = useState<'form' | 'loading' | 'result' | 'report'>('form');
+
+  // 在客户端从 LocalStorage 加载数据
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem('metaLogicDiagnosis');
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        setCurrentStep(parsedData.currentStep || 1);
+        setFormData(parsedData.formData || {
+          industry: '',
+          revenueScale: '',
+          painPoints: [],
+          onlineRatio: 50,
+          profitTrend: ''
+        });
+        setPageState(parsedData.pageState || 'form');
+      }
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+    }
+  }, []);
 
   // 监听数据变化并保存到 LocalStorage
   useEffect(() => {
@@ -106,7 +105,7 @@ const MetaLogicDiagnosis = () => {
   // 处理表单输入变化
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       [name]: value
     }));
@@ -114,7 +113,7 @@ const MetaLogicDiagnosis = () => {
 
   // 处理痛点选择
   const handlePainPointToggle = (painPoint: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       painPoints: prev.painPoints.includes(painPoint)
         ? prev.painPoints.filter(p => p !== painPoint)
@@ -124,7 +123,7 @@ const MetaLogicDiagnosis = () => {
 
   // 处理滑块变化
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       onlineRatio: parseInt(e.target.value)
     }));
@@ -387,7 +386,7 @@ const MetaLogicDiagnosis = () => {
                   onClick={async () => {
                     const { default: html2canvas } = await import('html2canvas');
                     const { default: jsPDF } = await import('jspdf');
-                    const reportElement = document.querySelector('.glass-card');
+                    const reportElement = document.querySelector('.glass-card') as HTMLElement;
                     if (reportElement) {
                       const canvas = await html2canvas(reportElement, {
                         scale: 2,

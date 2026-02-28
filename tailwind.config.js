@@ -9,12 +9,10 @@ module.exports = {
     extend: {
       colors: {
         primary: '#007AFF',
-        dark: {
-          900: '#0a0a0a',
-          800: '#1a1a1a',
-          700: '#2a2a2a',
-          600: '#3a3a3a',
-        },
+        'dark-900': '#0a0a0a',
+        'dark-800': '#1a1a1a',
+        'dark-700': '#2a2a2a',
+        'dark-600': '#3a3a3a',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

@@ -129,9 +129,30 @@ const MetaLogicDiagnosis = () => {
     }));
   };
 
+  // 验证当前步骤的表单数据
+  const validateCurrentStep = () => {
+    if (currentStep === 1 && !formData.industry) {
+      alert('请选择您的行业');
+      return false;
+    }
+    if (currentStep === 2 && !formData.revenueScale) {
+      alert('请选择您的营收规模');
+      return false;
+    }
+    if (currentStep === 3 && formData.painPoints.length === 0) {
+      alert('请至少选择一个核心痛点');
+      return false;
+    }
+    if (currentStep === 5 && !formData.profitTrend) {
+      alert('请选择您的利润趋势');
+      return false;
+    }
+    return true;
+  };
+
   // 下一步
   const nextStep = () => {
-    if (currentStep < totalSteps) {
+    if (validateCurrentStep() && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -146,14 +167,17 @@ const MetaLogicDiagnosis = () => {
   // 提交表单
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // 显示加载动画
-    setPageState('loading');
-    // 模拟生成报告的过程
-    setTimeout(() => {
-      setPageState('result');
-      // 这里可以添加表单提交逻辑
-      console.log('Form submitted:', formData);
-    }, 10000); // 10秒模拟加载时间
+    // 验证所有步骤的表单数据
+    if (validateCurrentStep()) {
+      // 显示加载动画
+      setPageState('loading');
+      // 模拟生成报告的过程
+      setTimeout(() => {
+        setPageState('result');
+        // 这里可以添加表单提交逻辑
+        console.log('Form submitted:', formData);
+      }, 10000); // 10秒模拟加载时间
+    }
   };
 
   // 返回表单
@@ -190,20 +214,25 @@ const MetaLogicDiagnosis = () => {
           {pageState === 'form' && (
             <>
               {/* 步骤指示器 */}
-              <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center mb-12">
                 {Array.from({ length: totalSteps }, (_, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${currentStep > index + 1 ? 'step-completed' : currentStep === index + 1 ? 'step-active' : 'border-dark-600 text-gray-400'}`}>
-                      {currentStep > index + 1 ? '✓' : index + 1}
+                  <React.Fragment key={index}>
+                    <div className="flex flex-col items-center">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${currentStep > index + 1 ? 'step-completed' : currentStep === index + 1 ? 'step-active' : 'border-dark-600 text-gray-400'}`}>
+                        {currentStep > index + 1 ? '✓' : index + 1}
+                      </div>
+                      <div className={`text-xs mt-2 ${currentStep >= index + 1 ? 'text-primary' : 'text-gray-500'}`}>
+                        {index + 1 === 1 && '行业'}
+                        {index + 1 === 2 && '营收'}
+                        {index + 1 === 3 && '痛点'}
+                        {index + 1 === 4 && '渠道'}
+                        {index + 1 === 5 && '利润'}
+                      </div>
                     </div>
-                    <div className={`text-xs mt-2 ${currentStep >= index + 1 ? 'text-primary' : 'text-gray-500'}`}>
-                      {index + 1 === 1 && '行业'}
-                      {index + 1 === 2 && '营收'}
-                      {index + 1 === 3 && '痛点'}
-                      {index + 1 === 4 && '渠道'}
-                      {index + 1 === 5 && '利润'}
-                    </div>
-                  </div>
+                    {index < totalSteps - 1 && (
+                      <div className={`step-connector ${currentStep > index + 1 ? 'active' : ''}`}></div>
+                    )}
+                  </React.Fragment>
                 ))}
               </div>
 

@@ -84,9 +84,14 @@ const MetaLogicDiagnosis = () => {
           profitTrend: ''
         });
         setPageState(parsedData.pageState || 'form');
+      } else {
+        // 如果没有保存的数据，重定向到介绍页面
+        window.location.href = '/intro';
       }
     } catch (error) {
       console.error('Error loading from localStorage:', error);
+      // 如果加载出错，重定向到介绍页面
+      window.location.href = '/intro';
     }
   }, []);
 
@@ -185,6 +190,11 @@ const MetaLogicDiagnosis = () => {
     setPageState('form');
   };
 
+  // 返回首页
+  const handleBackToHome = () => {
+    window.location.href = '/intro';
+  };
+
   // 解锁完整报告
   const handleUnlockReport = () => {
     setPageState('report');
@@ -196,10 +206,12 @@ const MetaLogicDiagnosis = () => {
       <header className="border-b border-dark-700 py-4 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer" onClick={handleBackToHome}>
               <span className="text-dark-900 font-bold">M</span>
             </div>
-            <h1 className="text-xl font-bold text-white">元逻辑诊断</h1>
+            <h1 className="text-xl font-bold text-white cursor-pointer" onClick={handleBackToHome}>
+              元逻辑诊断
+            </h1>
           </div>
           <div className="text-sm text-gray-400">
             基于第一性原理的企业数字化诊断
